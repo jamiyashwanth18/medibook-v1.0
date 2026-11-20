@@ -1,0 +1,12 @@
+line-length = 100
+target-version = "py312"
+
+[lint]
+select = ["E", "F", "I", "B", "UP"]
+# `ruff format` keeps code within the line length. What it cannot wrap -- strings,
+# docstrings and comments, many written from the approved architecture's prose -- is
+# left to the reader rather than failing the lint.
+ignore = ["E501"]
+
+[format]
+quote-style = "double"
