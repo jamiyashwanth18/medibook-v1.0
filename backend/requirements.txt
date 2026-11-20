@@ -18,6 +18,9 @@ ruff>=0.6
 passlib>=1.7.4
 # END QUORQ ARCHITECTURE PACKAGES
 
+# Schema migrations. The app's schema changes only through a new Alembic revision.
+alembic==1.13.3
+
 # passlib's bcrypt backend. Without it passlib falls back to the host's crypt(3),
 # which Python drops in 3.13 and not every base image supports -- so the hash a
 # password gets would depend on where the container happens to run.

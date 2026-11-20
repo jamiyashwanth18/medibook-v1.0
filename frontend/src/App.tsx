@@ -1,6 +1,7 @@
-import { NavLink, Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { NavLink, Navigate, Outlet, Route, Routes, useNavigate } from "react-router-dom";
 
 import { Icons } from "@/lib/icons";
+import { AuthProvider, RequireAuth, useAuth } from "@/lib/auth";
 import Login from "@/screens/Login";
 import FindDoctors from "@/screens/FindDoctors";
 import MyAppointments from "@/screens/MyAppointments";
@@ -16,6 +17,14 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 
 // The app's menu, drawn around every screen except the ones routed outside it below.
 function AppShellLayout() {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  async function handleSignOut() {
+    await logout();
+    navigate("/login", { replace: true });
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
       <header
@@ -25,7 +34,7 @@ function AppShellLayout() {
           borderColor: "var(--brand-border)",
         }}
       >
-        <div className="flex items-center gap-6 px-6 py-2">
+        <div className="flex flex-wrap items-center gap-6 px-6 py-2">
           <p
             className="shrink-0 text-sm font-semibold"
             style={{ fontFamily: "var(--brand-font-heading)" }}
@@ -52,10 +61,14 @@ function AppShellLayout() {
               <Icons.User size={16} />
               {"Admin console"}
             </NavLink>
-            <NavLink to="/login" className={navLinkClass}>
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className={navLinkClass({ isActive: false })}
+            >
               <Icons.X size={16} />
               {"Sign out"}
-            </NavLink>
+            </button>
           </nav>
         </div>
       </header>
@@ -68,16 +81,53 @@ function AppShellLayout() {
 
 export default function App() {
   return (
-    <Routes>
-      <Route element={<AppShellLayout />}>
-        <Route path="/find-doctors" element={<FindDoctors />} />
-        <Route path="/my-appointments" element={<MyAppointments />} />
-        <Route path="/doctor-schedule" element={<DoctorSchedule />} />
-        <Route path="/doctor-availability" element={<DoctorAvailability />} />
-        <Route path="/admin" element={<Admin />} />
-      </Route>
-      <Route path="/login" element={<Login />} />
-      <Route path="*" element={<Navigate to="/login" replace />} />
-    </Routes>
+    <AuthProvider>
+      <Routes>
+        <Route element={<AppShellLayout />}>
+          <Route
+            path="/find-doctors"
+            element={
+              <RequireAuth roles={["patient"]}>
+                <FindDoctors />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/my-appointments"
+            element={
+              <RequireAuth roles={["patient"]}>
+                <MyAppointments />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/doctor-schedule"
+            element={
+              <RequireAuth roles={["doctor"]}>
+                <DoctorSchedule />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/doctor-availability"
+            element={
+              <RequireAuth roles={["doctor"]}>
+                <DoctorAvailability />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <RequireAuth roles={["admin"]}>
+                <Admin />
+              </RequireAuth>
+            }
+          />
+        </Route>
+        <Route path="/login" element={<Login />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </AuthProvider>
   );
 }

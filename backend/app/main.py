@@ -8,31 +8,44 @@ OpenAPI document and passes its tests before a single handler is implemented.
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
+from alembic.config import Config as AlembicConfig
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app import models  # noqa: F401 -- imported so the tables register before create_all
+from alembic import command
+from app import models  # noqa: F401 -- imported so tables register before migrating
 from app.bootstrap import seed_bootstrap_users
 from app.config import get_settings
-from app.database import Base, SessionLocal, engine
+from app.database import SessionLocal
 from app.routers import api as api_router
 
 settings = get_settings()
 
+BACKEND_DIR = Path(__file__).resolve().parent.parent
+
+
+def _run_migrations() -> None:
+    """Bring the schema to head via Alembic -- the only way this app's schema
+    changes. Each revision only creates what is not already there, so this is
+    safe to run on every startup."""
+    config = AlembicConfig(str(BACKEND_DIR / "alembic.ini"))
+    config.set_main_option("script_location", str(BACKEND_DIR / "alembic"))
+    config.set_main_option("sqlalchemy.url", settings.database_url)
+    command.upgrade(config, "head")
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    """The scaffold ships no migrations, so the tables are created from the models
-    when the application starts. Replace this with Alembic before anything holds data
-    worth keeping.
+    """The schema is brought to head via Alembic when the application starts.
 
     This runs on startup and not at import, so importing the application never opens a
     connection. A test can therefore point `get_db` at a database of its own, and a
     deployment whose `DATABASE_URL` names a server that is not up fails where you can
     read the error, not while pytest collects the files.
     """
-    Base.metadata.create_all(bind=engine)
+    _run_migrations()
 
     # MEDIA_ROOT is a writable directory that survives redeploys; make sure it exists
     # before anything tries to write into it.

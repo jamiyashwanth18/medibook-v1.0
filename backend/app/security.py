@@ -11,11 +11,10 @@ token's contents.
 """
 
 import secrets
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from passlib.context import CryptContext
 
-from app.config import get_settings
 from app.models import utcnow
 
 # bcrypt only: one scheme, so a stored hash never depends on which host wrote it.
@@ -23,6 +22,12 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Number of random bytes behind a session token. 32 bytes is ~43 URL-safe characters.
 TOKEN_BYTES = 32
+
+# Fixed session lifetime rules (NFR-002): 30 minutes of inactivity, or 24 hours
+# from creation, whichever comes first. Not configurable -- the behaviour rules
+# give exact numbers, so there is nothing for an environment variable to tune.
+SESSION_ABSOLUTE_TTL = timedelta(hours=24)
+SESSION_INACTIVITY_TTL = timedelta(minutes=30)
 
 
 def hash_password(password: str) -> str:
@@ -51,5 +56,12 @@ def generate_session_token() -> str:
 
 
 def session_expiry(issued_at: datetime | None = None) -> datetime:
-    """When a session issued now stops being valid (SESSION_TTL_HOURS)."""
-    return (issued_at or utcnow()) + timedelta(hours=get_settings().session_ttl_hours)
+    """When a session issued now stops being valid at the latest (24h absolute)."""
+    return (issued_at or utcnow()) + SESSION_ABSOLUTE_TTL
+
+
+def iso_z(value: datetime) -> str:
+    """`value` as UTC ISO-8601 with a trailing 'Z', the shape every response uses."""
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=UTC)
+    return value.astimezone(UTC).isoformat().replace("+00:00", "Z")

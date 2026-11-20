@@ -20,6 +20,7 @@ from sqlalchemy.orm import Session
 from app.config import Settings, get_settings
 from app.database import get_db
 from app.models import ROLE_ADMIN, User, UserSession, utcnow
+from app.security import SESSION_INACTIVITY_TTL
 
 # auto_error=False: a missing header returns our own 401 with the same body as an
 # invalid one, rather than FastAPI's 403.
@@ -56,7 +57,12 @@ def get_current_session(credentials: Credentials, db: DbSession) -> UserSession:
     if expires_at is not None and expires_at <= utcnow():
         raise CREDENTIALS_ERROR
 
+    last_activity_at = _as_utc(session.last_activity_at)
+    if last_activity_at is not None and utcnow() - last_activity_at > SESSION_INACTIVITY_TTL:
+        raise CREDENTIALS_ERROR
+
     session.last_activity_at = utcnow()
+    db.commit()
     return session
 
 
@@ -103,3 +109,6 @@ def require_admin(user: CurrentUser) -> User:
             detail="Insufficient permissions",
         )
     return user
+
+
+AdminUser = Annotated[User, Depends(require_admin)]
