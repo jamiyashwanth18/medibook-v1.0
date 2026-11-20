@@ -10,7 +10,19 @@ import { useNavigate } from "@/lib/navigate";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { Button, Input, Label, Select, Badge, Avatar, Separator, Empty } = UI;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const { Search, Check, X, ChevronRight, Calendar, Clock, Filter, ArrowLeft, ArrowRight, AlertCircle, CheckCircle } = Icons;
+const {
+  Search,
+  Check,
+  X,
+  ChevronRight,
+  Calendar,
+  Clock,
+  Filter,
+  ArrowLeft,
+  ArrowRight,
+  AlertCircle,
+  CheckCircle,
+} = Icons;
 
 // ---------------------------------------------------------------------------
 // Atrium Clinic — reference data (stands in for the API responses this screen
@@ -25,24 +37,108 @@ const SPECIALIZATIONS = [
   { id: 4, name: "Dermatology", is_active: true },
   { id: 5, name: "Orthopaedics", is_active: true },
   { id: 6, name: "Paediatrics", is_active: true },
-  { id: 7, name: "ENT", is_active: true }
+  { id: 7, name: "ENT", is_active: true },
 ];
 
 const DISEASE_MAPPINGS = [
-  { id: "map_01", term: "chest pain", term_type: "symptom", is_active: true, specializations: ["Cardiology", "General Medicine"] },
-  { id: "map_02", term: "palpitations", term_type: "symptom", is_active: true, specializations: ["Cardiology"] },
-  { id: "map_03", term: "breathlessness", term_type: "symptom", is_active: true, specializations: ["Cardiology", "General Medicine"] },
-  { id: "map_04", term: "hypertension", term_type: "disease", is_active: true, specializations: ["Cardiology"] },
-  { id: "map_05", term: "migraine", term_type: "disease", is_active: true, specializations: ["Neurology"] },
-  { id: "map_06", term: "dizziness", term_type: "symptom", is_active: true, specializations: ["Neurology", "General Medicine"] },
-  { id: "map_07", term: "fever", term_type: "symptom", is_active: true, specializations: ["General Medicine"] },
-  { id: "map_08", term: "skin rash", term_type: "symptom", is_active: true, specializations: ["Dermatology"] },
-  { id: "map_09", term: "eczema", term_type: "disease", is_active: true, specializations: ["Dermatology"] },
-  { id: "map_10", term: "knee pain", term_type: "symptom", is_active: true, specializations: ["Orthopaedics"] },
-  { id: "map_11", term: "back pain", term_type: "symptom", is_active: true, specializations: ["Orthopaedics"] },
-  { id: "map_12", term: "sore throat", term_type: "symptom", is_active: true, specializations: ["ENT", "General Medicine"] },
-  { id: "map_13", term: "ear pain", term_type: "symptom", is_active: true, specializations: ["ENT"] },
-  { id: "map_14", term: "child fever", term_type: "symptom", is_active: true, specializations: ["Paediatrics"] }
+  {
+    id: "map_01",
+    term: "chest pain",
+    term_type: "symptom",
+    is_active: true,
+    specializations: ["Cardiology", "General Medicine"],
+  },
+  {
+    id: "map_02",
+    term: "palpitations",
+    term_type: "symptom",
+    is_active: true,
+    specializations: ["Cardiology"],
+  },
+  {
+    id: "map_03",
+    term: "breathlessness",
+    term_type: "symptom",
+    is_active: true,
+    specializations: ["Cardiology", "General Medicine"],
+  },
+  {
+    id: "map_04",
+    term: "hypertension",
+    term_type: "disease",
+    is_active: true,
+    specializations: ["Cardiology"],
+  },
+  {
+    id: "map_05",
+    term: "migraine",
+    term_type: "disease",
+    is_active: true,
+    specializations: ["Neurology"],
+  },
+  {
+    id: "map_06",
+    term: "dizziness",
+    term_type: "symptom",
+    is_active: true,
+    specializations: ["Neurology", "General Medicine"],
+  },
+  {
+    id: "map_07",
+    term: "fever",
+    term_type: "symptom",
+    is_active: true,
+    specializations: ["General Medicine"],
+  },
+  {
+    id: "map_08",
+    term: "skin rash",
+    term_type: "symptom",
+    is_active: true,
+    specializations: ["Dermatology"],
+  },
+  {
+    id: "map_09",
+    term: "eczema",
+    term_type: "disease",
+    is_active: true,
+    specializations: ["Dermatology"],
+  },
+  {
+    id: "map_10",
+    term: "knee pain",
+    term_type: "symptom",
+    is_active: true,
+    specializations: ["Orthopaedics"],
+  },
+  {
+    id: "map_11",
+    term: "back pain",
+    term_type: "symptom",
+    is_active: true,
+    specializations: ["Orthopaedics"],
+  },
+  {
+    id: "map_12",
+    term: "sore throat",
+    term_type: "symptom",
+    is_active: true,
+    specializations: ["ENT", "General Medicine"],
+  },
+  {
+    id: "map_13",
+    term: "ear pain",
+    term_type: "symptom",
+    is_active: true,
+    specializations: ["ENT"],
+  },
+  {
+    id: "map_14",
+    term: "child fever",
+    term_type: "symptom",
+    is_active: true,
+    specializations: ["Paediatrics"],
+  },
 ];
 
 // Seven bookable days, starting at the date the patient landed on.
@@ -53,7 +149,7 @@ const DATES = [
   { key: "2026-11-24", wd: "Mon", label: "Mon 24 Nov 2026", short: "Mon 24 Nov" },
   { key: "2026-11-25", wd: "Tue", label: "Tue 25 Nov 2026", short: "Tue 25 Nov" },
   { key: "2026-11-26", wd: "Wed", label: "Wed 26 Nov 2026", short: "Wed 26 Nov" },
-  { key: "2026-11-27", wd: "Thu", label: "Thu 27 Nov 2026", short: "Thu 27 Nov" }
+  { key: "2026-11-27", wd: "Thu", label: "Thu 27 Nov 2026", short: "Thu 27 Nov" },
 ];
 
 const DOCTORS = [
@@ -67,19 +163,25 @@ const DOCTORS = [
     note: "14 yrs · interventional cardiology",
     languages: "english, hindi, kannada",
     rules: {
-      Fri: [["09:00", "12:00"], ["16:00", "17:00"]],
+      Fri: [
+        ["09:00", "12:00"],
+        ["16:00", "17:00"],
+      ],
       Sat: [["09:00", "11:00"]],
       Mon: [["10:00", "13:00"]],
       Wed: [["09:00", "12:00"]],
-      Thu: [["09:00", "11:30"], ["15:00", "16:30"]]
+      Thu: [
+        ["09:00", "11:30"],
+        ["15:00", "16:30"],
+      ],
     },
     booked: {
       "2026-11-21": ["10:00", "10:30", "11:30", "16:00"],
       "2026-11-22": ["10:00"],
       "2026-11-24": ["11:00"],
-      "2026-11-26": ["09:00", "09:30"]
+      "2026-11-26": ["09:00", "09:30"],
     },
-    timeOff: [{ date: "2026-11-25", reason: "cardiology conference, chennai" }]
+    timeOff: [{ date: "2026-11-25", reason: "cardiology conference, chennai" }],
   },
   {
     id: "doc_117",
@@ -91,16 +193,19 @@ const DOCTORS = [
     note: "9 yrs · heart failure clinic",
     languages: "english, malayalam, tamil",
     rules: {
-      Fri: [["08:30", "10:30"], ["15:00", "16:00"]],
+      Fri: [
+        ["08:30", "10:30"],
+        ["15:00", "16:00"],
+      ],
       Tue: [["09:00", "12:00"]],
       Wed: [["14:00", "17:00"]],
-      Thu: [["09:00", "11:00"]]
+      Thu: [["09:00", "11:00"]],
     },
     booked: {
       "2026-11-21": ["08:30", "09:30"],
-      "2026-11-25": ["10:00", "10:30"]
+      "2026-11-25": ["10:00", "10:30"],
     },
-    timeOff: []
+    timeOff: [],
   },
   {
     id: "doc_131",
@@ -112,20 +217,34 @@ const DOCTORS = [
     note: "11 yrs · internal medicine",
     languages: "english, tamil, hindi",
     rules: {
-      Fri: [["09:30", "12:30"], ["17:00", "19:00"]],
+      Fri: [
+        ["09:30", "12:30"],
+        ["17:00", "19:00"],
+      ],
       Sat: [["10:00", "13:00"]],
       Mon: [["09:00", "12:00"]],
       Tue: [["09:00", "12:00"]],
       Wed: [["09:00", "11:00"]],
-      Thu: [["16:00", "19:00"]]
+      Thu: [["16:00", "19:00"]],
     },
     booked: {
       // fully booked on the 21st — a real Friday at a busy clinic
-      "2026-11-21": ["09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "17:00", "17:30", "18:00", "18:30"],
+      "2026-11-21": [
+        "09:30",
+        "10:00",
+        "10:30",
+        "11:00",
+        "11:30",
+        "12:00",
+        "17:00",
+        "17:30",
+        "18:00",
+        "18:30",
+      ],
       "2026-11-24": ["09:00", "09:30"],
-      "2026-11-27": ["16:00"]
+      "2026-11-27": ["16:00"],
     },
-    timeOff: []
+    timeOff: [],
   },
   {
     id: "doc_142",
@@ -138,7 +257,7 @@ const DOCTORS = [
     languages: "english, gujarati, hindi",
     rules: { Fri: [["11:00", "13:00"]], Mon: [["09:00", "12:00"]], Wed: [["15:00", "18:00"]] },
     booked: { "2026-11-21": ["11:30"] },
-    timeOff: []
+    timeOff: [],
   },
   {
     id: "doc_155",
@@ -151,7 +270,7 @@ const DOCTORS = [
     languages: "english, urdu, hindi",
     rules: { Sat: [["09:00", "12:00"]], Tue: [["10:00", "13:00"]], Thu: [["09:00", "11:00"]] },
     booked: { "2026-11-22": ["09:00"] },
-    timeOff: []
+    timeOff: [],
   },
   {
     id: "doc_163",
@@ -164,7 +283,7 @@ const DOCTORS = [
     languages: "english, malayalam",
     rules: { Fri: [["09:00", "11:00"]], Mon: [["14:00", "17:00"]] },
     booked: { "2026-11-21": ["09:00", "09:30"] },
-    timeOff: []
+    timeOff: [],
   },
   {
     id: "doc_171",
@@ -177,7 +296,7 @@ const DOCTORS = [
     languages: "english, hindi",
     rules: { Fri: [["14:00", "17:00"]], Wed: [["09:00", "12:00"]] },
     booked: { "2026-11-21": ["14:00", "15:30"] },
-    timeOff: []
+    timeOff: [],
   },
   {
     id: "doc_179",
@@ -190,7 +309,7 @@ const DOCTORS = [
     languages: "english, tamil",
     rules: { Fri: [["10:00", "12:00"]], Thu: [["14:00", "16:00"]] },
     booked: {},
-    timeOff: []
+    timeOff: [],
   },
   {
     // deactivated by an admin — never appears in patient search
@@ -204,8 +323,8 @@ const DOCTORS = [
     languages: "english",
     rules: {},
     booked: {},
-    timeOff: []
-  }
+    timeOff: [],
+  },
 ];
 
 // The slot another patient is racing us for — used to demonstrate the
@@ -217,7 +336,15 @@ export default function Screen() {
   // ----- colour helpers, all derived from the brand roles --------------------
   const hexToRgba = (hex, a) => {
     const h = String(hex).replace("#", "");
-    const n = parseInt(h.length === 3 ? h.split("").map((c) => c + c).join("") : h, 16);
+    const n = parseInt(
+      h.length === 3
+        ? h
+            .split("")
+            .map((c) => c + c)
+            .join("")
+        : h,
+      16,
+    );
     return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
   };
   const ink = brand.primaryColor;
@@ -286,10 +413,15 @@ export default function Screen() {
     const ranges = doc.rules[date.wd] || [];
     const out = [];
     ranges.forEach(([s, e]) => {
-      for (let t = toMin(s); t + doc.slot_duration_minutes <= toMin(e); t += doc.slot_duration_minutes) {
+      for (
+        let t = toMin(s);
+        t + doc.slot_duration_minutes <= toMin(e);
+        t += doc.slot_duration_minutes
+      ) {
         const start = toHHMM(t);
         const key = `${doc.id}|${date.key}|${start}`;
-        const alreadyBooked = (doc.booked[date.key] || []).includes(start) || takenSince.includes(key);
+        const alreadyBooked =
+          (doc.booked[date.key] || []).includes(start) || takenSince.includes(key);
         if (!alreadyBooked) {
           out.push({ key, start, end: toHHMM(t + doc.slot_duration_minutes), date });
         }
@@ -303,15 +435,17 @@ export default function Screen() {
     const q = raw.trim().toLowerCase();
     if (!q) return { kind: "none", specs: [] };
     const exactMap = DISEASE_MAPPINGS.find((m) => m.is_active && m.term === q);
-    if (exactMap) return { kind: "mapping", specs: exactMap.specializations, term_type: exactMap.term_type };
+    if (exactMap)
+      return { kind: "mapping", specs: exactMap.specializations, term_type: exactMap.term_type };
     const spec = SPECIALIZATIONS.find((s) => s.is_active && s.name.toLowerCase() === q);
     if (spec) return { kind: "specialization", specs: [spec.name] };
     const looseMap = DISEASE_MAPPINGS.find(
-      (m) => m.is_active && (m.term.includes(q) || q.includes(m.term))
+      (m) => m.is_active && (m.term.includes(q) || q.includes(m.term)),
     );
-    if (looseMap) return { kind: "mapping", specs: looseMap.specializations, term_type: looseMap.term_type };
+    if (looseMap)
+      return { kind: "mapping", specs: looseMap.specializations, term_type: looseMap.term_type };
     const looseSpec = SPECIALIZATIONS.find(
-      (s) => s.is_active && q.length >= 3 && s.name.toLowerCase().includes(q)
+      (s) => s.is_active && q.length >= 3 && s.name.toLowerCase().includes(q),
     );
     if (looseSpec) return { kind: "specialization", specs: [looseSpec.name] };
     return { kind: "none", specs: [] };
@@ -325,9 +459,9 @@ export default function Screen() {
         (d) =>
           d.is_active &&
           d.specializations.some((s) => match.specs.includes(s)) &&
-          (specFilter === "all" || d.specializations.includes(specFilter))
+          (specFilter === "all" || d.specializations.includes(specFilter)),
       ),
-    [match, specFilter]
+    [match, specFilter],
   );
 
   const activeDate = DATES.find((d) => d.key === dateKey) || DATES[0];
@@ -343,11 +477,12 @@ export default function Screen() {
     return null;
   };
 
-  const doctor =
-    matchedDoctors.find((d) => d.id === chosenDoctor) || matchedDoctors[0] || null;
+  const doctor = matchedDoctors.find((d) => d.id === chosenDoctor) || matchedDoctors[0] || null;
 
   const groups = doctor
-    ? range.map((d) => ({ date: d, slots: slotsFor(doctor, d) })).filter((g) => !week || g.slots.length)
+    ? range
+        .map((d) => ({ date: d, slots: slotsFor(doctor, d) }))
+        .filter((g) => !week || g.slots.length)
     : [];
   const visibleSlots = groups.reduce((n, g) => n + g.slots.length, 0);
 
@@ -361,7 +496,7 @@ export default function Screen() {
     const q = query.trim();
     if (q.length < 2) {
       setFormError(
-        'type at least two letters — try a symptom like "chest pain", or a specialization like "cardiology".'
+        'type at least two letters — try a symptom like "chest pain", or a specialization like "cardiology".',
       );
       return;
     }
@@ -374,7 +509,7 @@ export default function Screen() {
       setStatus("results");
       const next = resolve(q);
       const first = DOCTORS.find(
-        (d) => d.is_active && d.specializations.some((s) => next.specs.includes(s))
+        (d) => d.is_active && d.specializations.some((s) => next.specs.includes(s)),
       );
       setChosenDoctor(first ? first.id : null);
     }, 620);
@@ -388,14 +523,17 @@ export default function Screen() {
       if (!refreshedOnce) {
         setRefreshedOnce(true);
         setTakenSince((t) =>
-          t.includes("doc_104|2026-11-21|11:00") ? t : [...t, "doc_104|2026-11-21|11:00"]
+          t.includes("doc_104|2026-11-21|11:00") ? t : [...t, "doc_104|2026-11-21|11:00"],
         );
         setNotice({
           tone: "stale",
           text: "11:00 – 11:30 with Dr. Anjali Rao was taken by another patient while this page was open. the list below is up to date.",
         });
       } else {
-        setNotice({ tone: "calm", text: "nothing changed — every slot below was still open a moment ago." });
+        setNotice({
+          tone: "calm",
+          text: "nothing changed — every slot below was still open a moment ago.",
+        });
       }
     }, 560);
   };
@@ -461,7 +599,7 @@ export default function Screen() {
   const trapTab = (e) => {
     if (e.key !== "Tab" || !dialogRef.current) return;
     const nodes = dialogRef.current.querySelectorAll(
-      'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
     );
     if (!nodes.length) return;
     const first = nodes[0];
@@ -612,7 +750,11 @@ export default function Screen() {
               value={specFilter}
               onChange={(e) => setSpecFilter(e.target.value)}
               className="mt-2 h-12 w-full rounded-full border-0 px-5 text-[15px]"
-              style={{ backgroundColor: cream, color: ink, boxShadow: `inset 0 0 0 1px ${soft(0.18)}` }}
+              style={{
+                backgroundColor: cream,
+                color: ink,
+                boxShadow: `inset 0 0 0 1px ${soft(0.18)}`,
+              }}
             >
               <option value="all">All matching specializations</option>
               {filterOptions.map((s) => (
@@ -672,7 +814,10 @@ export default function Screen() {
             </button>
           </div>
 
-          <p className="ml-auto max-w-[30ch] text-[13px] leading-relaxed" style={{ color: soft(0.6) }}>
+          <p
+            className="ml-auto max-w-[30ch] text-[13px] leading-relaxed"
+            style={{ color: soft(0.6) }}
+          >
             {week
               ? "browsing fri 21 – thu 27 nov. the date filter is paused."
               : `showing availability for ${activeDate.label.toLowerCase()}.`}
@@ -743,13 +888,19 @@ export default function Screen() {
                         backgroundColor: selected ? gold(0.12) : soft(0.05),
                         borderBottomLeftRadius: brand.radius,
                         borderBottomRightRadius: brand.radius,
-                        boxShadow: selected ? `inset 0 0 0 2px ${accent}` : `inset 0 0 0 1px ${soft(0.1)}`,
+                        boxShadow: selected
+                          ? `inset 0 0 0 2px ${accent}`
+                          : `inset 0 0 0 1px ${soft(0.1)}`,
                       }}
                     >
                       <Avatar name={d.name} className="h-16 w-16" />
                       <h3
                         className="mt-4 text-[20px] leading-snug"
-                        style={{ fontFamily: brand.fontHeading, fontStyle: "italic", fontWeight: 600 }}
+                        style={{
+                          fontFamily: brand.fontHeading,
+                          fontStyle: "italic",
+                          fontWeight: 600,
+                        }}
                       >
                         {d.name}
                       </h3>
@@ -795,7 +946,9 @@ export default function Screen() {
                             {off
                               ? `on time off — ${off.reason}.`
                               : `fully booked on ${activeDate.short.toLowerCase()}.`}
-                            {nextOpen(d) ? ` next open: ${nextOpen(d)}.` : " no open slots this week."}
+                            {nextOpen(d)
+                              ? ` next open: ${nextOpen(d)}.`
+                              : " no open slots this week."}
                           </span>
                         </p>
                       ) : null}
@@ -812,8 +965,8 @@ export default function Screen() {
                           count === 0
                             ? { ...quietBtn, opacity: 0.5, cursor: "not-allowed" }
                             : selected
-                            ? primaryBtn
-                            : quietBtn
+                              ? primaryBtn
+                              : quietBtn
                         }
                       >
                         {selected ? (
@@ -879,7 +1032,10 @@ export default function Screen() {
               <p
                 aria-live="polite"
                 className="mt-4 flex items-start gap-3 rounded-[20px] px-5 py-4 text-[14px] leading-relaxed"
-                style={{ backgroundColor: notice.tone === "stale" ? gold(0.16) : soft(0.07), color: soft(0.9) }}
+                style={{
+                  backgroundColor: notice.tone === "stale" ? gold(0.16) : soft(0.07),
+                  color: soft(0.9),
+                }}
               >
                 {notice.tone === "stale" ? (
                   <AlertCircle aria-hidden="true" className="mt-[2px] h-[18px] w-[18px] shrink-0" />
@@ -924,12 +1080,18 @@ export default function Screen() {
                 className="mt-6 rounded-[20px] px-6 py-8 text-center"
                 style={{ backgroundColor: cream }}
               >
-                <p className="text-[16px]" style={{ fontFamily: brand.fontHeading, fontStyle: "italic" }}>
+                <p
+                  className="text-[16px]"
+                  style={{ fontFamily: brand.fontHeading, fontStyle: "italic" }}
+                >
                   {timeOffFor(doctor, activeDate)
                     ? `${doctor.name} is on time off that day`
                     : `${doctor.name} is fully booked on ${activeDate.short.toLowerCase()}`}
                 </p>
-                <p className="mx-auto mt-2 max-w-[52ch] text-[14px] leading-relaxed" style={{ color: soft(0.66) }}>
+                <p
+                  className="mx-auto mt-2 max-w-[52ch] text-[14px] leading-relaxed"
+                  style={{ color: soft(0.66) }}
+                >
                   {timeOffFor(doctor, activeDate)
                     ? `reason on file: ${timeOffFor(doctor, activeDate).reason}. `
                     : "every slot is taken. "}
@@ -949,12 +1111,17 @@ export default function Screen() {
                     ) : null}
                     <ul className="flex flex-wrap gap-3">
                       {g.slots.map((s, i) => {
-                        const idx = groups
-                          .slice(0, groups.indexOf(g))
-                          .reduce((n, prev) => n + prev.slots.length, 0) + i;
+                        const idx =
+                          groups
+                            .slice(0, groups.indexOf(g))
+                            .reduce((n, prev) => n + prev.slots.length, 0) + i;
                         const isPending = pending && pending.key === s.key;
                         return (
-                          <li key={s.key} className="atrium-rise" style={{ animationDelay: `${idx * 0.03}s` }}>
+                          <li
+                            key={s.key}
+                            className="atrium-rise"
+                            style={{ animationDelay: `${idx * 0.03}s` }}
+                          >
                             <button
                               type="button"
                               data-wf={idx < 4 ? `i-5-0-${idx}` : undefined}
@@ -1048,7 +1215,10 @@ export default function Screen() {
                 )
               }
             />
-            <p className="mx-auto mt-4 max-w-[54ch] text-center text-[13px] leading-relaxed" style={{ color: soft(0.6) }}>
+            <p
+              className="mx-auto mt-4 max-w-[54ch] text-center text-[13px] leading-relaxed"
+              style={{ color: soft(0.6) }}
+            >
               our directory maps everyday terms — chest pain, migraine, knee pain, sore throat — to
               the right specialization. if yours is missing, the front desk can add it.
             </p>
@@ -1117,8 +1287,8 @@ export default function Screen() {
               {modalState === "success"
                 ? "Booking confirmed"
                 : modalState === "error"
-                ? "That slot has just gone"
-                : "Confirm booking"}
+                  ? "That slot has just gone"
+                  : "Confirm booking"}
             </h2>
 
             <p className="mt-2 text-[15px] leading-relaxed" style={{ color: soft(0.72) }}>
@@ -1127,8 +1297,8 @@ export default function Screen() {
                     booking ? booking.ref : ""
                   }, status booked.`
                 : modalState === "error"
-                ? "another patient confirmed this slot a moment before you. nothing was charged and nothing was booked — pick another time below and we will hold it."
-                : "one patient per slot. we will hold this time the moment you confirm."}
+                  ? "another patient confirmed this slot a moment before you. nothing was charged and nothing was booked — pick another time below and we will hold it."
+                  : "one patient per slot. we will hold this time the moment you confirm."}
             </p>
 
             <dl

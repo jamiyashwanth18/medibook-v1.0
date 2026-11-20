@@ -1,0 +1,33 @@
+{
+  "key": {
+    "app_design_id": "b4b99595-0a84-4ae8-9b3b-547d3ad07643",
+    "app_design_version": 1,
+    "architecture_document_id": "6a8fdd83-3fec-464b-ac30-ff910564af78",
+    "architecture_version": 1
+  },
+  "outcome": "prepared",
+  "packages": [
+    {
+      "ecosystem": "pypi",
+      "installed_version": "1.7.4",
+      "name": "passlib",
+      "status": "installed",
+      "version": ">=1.7.4"
+    },
+    {
+      "ecosystem": "npm",
+      "error": "already provided by the scaffold",
+      "name": "react-router-dom",
+      "status": "skipped",
+      "version": ">=6"
+    },
+    {
+      "ecosystem": "npm",
+      "error": "already provided by the scaffold",
+      "name": "date-fns",
+      "status": "skipped",
+      "version": ">=3"
+    }
+  ],
+  "prepared_by_run": "f206d3de-66ea-44d8-9a00-a51e6479a92a"
+}
