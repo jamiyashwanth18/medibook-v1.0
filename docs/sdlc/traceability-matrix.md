@@ -9,10 +9,10 @@ Built from recorded links, not written by a model: requirement key → plan item
 <!-- sdlc:auto:start matrix -->
 | Requirement | Epic | Title | Plan items | Sprint | Design | Code | Commits | Ticket | Tests | AC tests | Deployed |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| US-001 | EPIC-001 | Patient self-registration | US-001 | 1 | POST /auth/register, api, db, patients, spa, users | — | — | not started | not run | 0/3 tested · 0/3 passing | — |
-| US-002 | EPIC-001 | Login and logout | US-002 | 1 | GET /auth/me, POST /auth/login, POST /auth/logout, api, db, sessions, spa, users | — | — | not started | not run | 0/3 tested · 0/3 passing | — |
-| US-003 | EPIC-001 | Password stored and sessions expire safely | US-003 | 1 | api, db, sessions, users | — | — | not started | not run | 0/3 tested · 0/3 passing | — |
-| US-004 | EPIC-001 | Role-based access enforcement | US-004 | 1 | api, spa, users | — | — | not started | not run | 0/3 tested · 0/3 passing | — |
+| US-001 | EPIC-001 | Patient self-registration | US-001 | 1 | POST /auth/register, api, db, patients, spa, users | backend/alembic.ini, backend/alembic/env.py, backend/alembic/script.py.mako, backend/alembic/versions/0001_initial_schema.py, backend/alembic/versions/0002_sessions_token_unique_index.py +24 more | debc5b0 | delivered | succeeded | 3/3 tested · 0/3 passing | — |
+| US-002 | EPIC-001 | Login and logout | US-002 | 1 | GET /auth/me, POST /auth/login, POST /auth/logout, api, db, sessions, spa, users | — | debc5b0 | delivered | not run | 3/3 tested · 2/3 passing | — |
+| US-003 | EPIC-001 | Password stored and sessions expire safely | US-003 | 1 | api, db, sessions, users | — | debc5b0 | delivered | not run | 3/3 tested · 1/3 passing | — |
+| US-004 | EPIC-001 | Role-based access enforcement | US-004 | 1 | api, spa, users | — | debc5b0 | delivered | not run | 3/3 tested · 1/3 passing | — |
 | US-005 | EPIC-002 | Manage specializations | US-005 | 2 | GET /specializations, PATCH /specializations/{id}, POST /specializations, api, db, spa, specializations | — | — | not started | not run | 0/3 tested · 0/3 passing | — |
 | US-006 | EPIC-002 | Manage doctor records | US-006 | 2 | PATCH /doctors/{id}, POST /doctors, api, db, doctor_specializations, doctors, spa | — | — | not started | not run | 0/3 tested · 0/3 passing | — |
 | US-007 | EPIC-003 | Maintain disease-to-specialization mappings | US-007 | 3 | GET /disease-mappings, PATCH /disease-mappings/{id}, POST /disease-mappings, api, db, disease_mapping_specializations, disease_mappings, spa | — | — | not started | not run | 0/3 tested · 0/3 passing | — |

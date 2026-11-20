@@ -90,6 +90,24 @@ Capacity: 20 points · Committed: 20
 | US-024 | Story | Audit trail on record access and changes | 5 | security-agent | US-018 |
 | US-025 | Story | In-app appointment confirmation and status visibility | 2 | frontend-agent | US-012, US-014, US-015 |
 
+## Sprint 7: Fixes
+
+Fix the findings SonarQube reported.
+
+Capacity: 0 points · Committed: 0
+
+| Key | Type | Title | Points | Role | Depends on |
+|---|---|---|---|---|---|
+| FIX-SEC-githubactions-s7637-53fd1e3a | Story | Fix: Use full commit SHA hash for this dependency. (.github/workflows/deploy.yml) | — | devops-agent | — |
+| FIX-SEC-githubactions-s6505-69f642a9 | Story | Fix: Omitting "--ignore-scripts" allows lifecycle scripts to run during package installation. (.github/workflows/deploy.yml) | — | devops-agent | — |
+| FIX-SEC-githubactions-s8543-ca13026c | Story | Fix: Using dependencies without locking resolved versions is security-sensitive. (.github/workflows/deploy.yml) | — | devops-agent | — |
+| FIX-SEC-docker-s8541-ea3951c1 | Story | Fix: Omitting "--only-binary :all:" can lead to the execution of setup scripts. Make sure it is safe here. (backend/Dockerfile) | — | — | — |
+| FIX-SEC-docker-s8544-82cfea7f | Story | Fix: Using dependencies without locking resolved versions is security-sensitive. (backend/Dockerfile) | — | — | — |
+| FIX-SEC-python-s7608-bce01fa0 | Story | Fix: Add the 'ExpectedBucketOwner' parameter to verify S3 bucket ownership. (backend/scripts/check_connections.py) | — | — | — |
+| FIX-DAST-zap-10038-a3ec3827 | Story | Fix: Content Security Policy (CSP) Header Not Set | — | backend-agent | — |
+| FIX-DAST-zap-10020-c96362a3 | Story | Fix: Missing Anti-clickjacking Header | — | backend-agent | — |
+| FIX-A11Y-color-contrast-8d7ef0b7 | Story | Fix: Elements must meet minimum color contrast ratio thresholds | — | frontend-agent | — |
+
 ## Unscheduled
 
 _Nothing unscheduled._
