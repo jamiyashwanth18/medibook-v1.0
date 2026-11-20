@@ -115,6 +115,33 @@ class LoginResponse(BaseModel):
     user: UserOut
 
 
+class SpecializationCreateRequest(BaseModel):
+    """POST /specializations body (admin-only)."""
+
+    name: str
+
+    @field_validator("name")
+    @classmethod
+    def _name_not_blank(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError("name is required")
+        return value
+
+
+class SpecializationOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    name: str
+    is_active: bool
+
+    @field_validator("id", mode="before")
+    @classmethod
+    def _id_as_str(cls, value: object) -> str:
+        return str(value)
+
+
 class DoctorCreateRequest(BaseModel):
     """POST /doctors body (admin-only): creates the doctor's profile and the
     login they use to manage it."""

@@ -197,7 +197,7 @@ export default function Screen() {
                   tab === "register" ? "bg-white shadow-sm" : "text-slate-500"
                 }`}
               >
-                Register
+                Register as a patient
               </button>
             </div>
           </CardHeader>

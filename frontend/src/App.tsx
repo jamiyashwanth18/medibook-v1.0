@@ -61,14 +61,17 @@ function AppShellLayout() {
               <Icons.User size={16} />
               {"Admin console"}
             </NavLink>
-            <button
-              type="button"
-              onClick={handleSignOut}
+            <a
+              href="/login"
+              onClick={(e) => {
+                e.preventDefault();
+                void handleSignOut();
+              }}
               className={navLinkClass({ isActive: false })}
             >
               <Icons.X size={16} />
               {"Sign out"}
-            </button>
+            </a>
           </nav>
         </div>
       </header>

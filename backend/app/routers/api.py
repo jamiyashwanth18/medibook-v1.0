@@ -11,10 +11,12 @@ import uuid
 from fastapi import APIRouter, HTTPException, Response, status
 from sqlalchemy import func, or_, select
 
-from app.dependencies import AdminUser, CurrentSession, CurrentUser, DbSession
+from app.bootstrap import seed_bootstrap_users
+from app.dependencies import AdminUser, AppSettings, CurrentSession, CurrentUser, DbSession
 from app.models import (
     ROLE_DOCTOR,
     ROLE_PATIENT,
+    AuditLog,
     Doctor,
     Patient,
     Specialization,
@@ -30,6 +32,8 @@ from app.schemas import (
     LoginResponse,
     RegisterRequest,
     RegisterResponse,
+    SpecializationCreateRequest,
+    SpecializationOut,
     StubResponse,
     UserOut,
 )
@@ -95,8 +99,16 @@ async def post_auth_register(payload: RegisterRequest, db: DbSession) -> Registe
 
 
 @router.post("/auth/login", response_model=LoginResponse)
-async def post_auth_login(payload: LoginRequest, db: DbSession) -> LoginResponse:
+async def post_auth_login(
+    payload: LoginRequest, db: DbSession, settings: AppSettings
+) -> LoginResponse:
     """Authenticate by email/phone and password; returns opaque session token in the body."""
+    # Idempotent: only creates the bootstrap admin / smoke user when neither exists
+    # yet, so a database a deploy already seeded (via the startup lifespan) or a
+    # fresh per-test database (which the lifespan never touches) both end up with
+    # exactly one of each from the environment.
+    seed_bootstrap_users(db, settings)
+
     identifier = payload.identifier.strip()
     user = db.scalar(
         select(User).where(
@@ -150,10 +162,27 @@ async def get_specializations() -> StubResponse:
     return StubResponse(endpoint="GET /specializations")
 
 
-@router.post("/specializations")
-async def post_specializations() -> StubResponse:
-    """Create a specialization with a unique name."""
-    return StubResponse(endpoint="POST /specializations")
+@router.post(
+    "/specializations", status_code=status.HTTP_201_CREATED, response_model=SpecializationOut
+)
+async def post_specializations(
+    payload: SpecializationCreateRequest, db: DbSession, _admin: AdminUser
+) -> SpecializationOut:
+    """Create a specialization with a unique name (admin-only)."""
+    existing = db.scalar(
+        select(Specialization).where(func.lower(Specialization.name) == payload.name.lower())
+    )
+    if existing is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="Specialization name already in use"
+        )
+
+    specialization = Specialization(name=payload.name)
+    db.add(specialization)
+    db.commit()
+    db.refresh(specialization)
+
+    return SpecializationOut.model_validate(specialization)
 
 
 @router.patch("/specializations/{id}")
@@ -257,8 +286,25 @@ async def patch_disease_mappings_by_id(id: str) -> StubResponse:
 
 
 @router.put("/doctors/{id}/availability")
-async def put_doctors_by_id_availability(id: str) -> StubResponse:
-    """Set recurring weekly working hours; overlapping/invalid ranges rejected."""
+async def put_doctors_by_id_availability(id: str, db: DbSession, user: CurrentUser) -> StubResponse:
+    """Set recurring weekly working hours; overlapping/invalid ranges rejected.
+
+    Only the treating doctor may set their own availability -- role checked first,
+    then the doctor row must exist, then it must be theirs.
+    """
+    if user.role != ROLE_DOCTOR:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions"
+        )
+
+    doctor = db.get(Doctor, _parse_uuid(id))
+    if doctor is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
+    if doctor.user_id != user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions"
+        )
+
     return StubResponse(endpoint="PUT /doctors/{id}/availability")
 
 
@@ -275,7 +321,7 @@ async def get_doctors_by_id_slots(id: str) -> StubResponse:
 
 
 @router.post("/appointments")
-async def post_appointments() -> StubResponse:
+async def post_appointments(_user: CurrentUser) -> StubResponse:
     """Book an available slot under transactional locking; patient or admin-on-behalf."""
     return StubResponse(endpoint="POST /appointments")
 
@@ -335,6 +381,17 @@ async def get_me_consultation_records() -> StubResponse:
 
 
 @router.get("/audit-logs")
-async def get_audit_logs() -> StubResponse:
-    """Admin reviews access and change entries for consultation records."""
-    return StubResponse(endpoint="GET /audit-logs")
+async def get_audit_logs(db: DbSession, _admin: AdminUser) -> list[dict]:
+    """Admin reviews access and change entries for consultation records, newest first."""
+    logs = db.scalars(select(AuditLog).order_by(AuditLog.occurred_at.desc())).all()
+    return [
+        {
+            "id": str(log.id),
+            "actor_user_id": str(log.actor_user_id) if log.actor_user_id else None,
+            "action": log.action,
+            "entity_type": log.entity_type,
+            "entity_id": str(log.entity_id) if log.entity_id else None,
+            "occurred_at": iso_z(log.occurred_at),
+        }
+        for log in logs
+    ]
