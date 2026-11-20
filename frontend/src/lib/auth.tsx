@@ -22,7 +22,6 @@ export interface AuthUser {
 
 interface LoginResponse {
   token: string;
-  expires_at: string;
   user: AuthUser;
 }
 
