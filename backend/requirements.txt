@@ -13,3 +13,12 @@ pytest>=8.3
 # back to show on the development dashboard.
 pytest-cov>=5.0
 ruff>=0.6
+
+# BEGIN QUORQ ARCHITECTURE PACKAGES
+passlib>=1.7.4
+# END QUORQ ARCHITECTURE PACKAGES
+
+# passlib's bcrypt backend. Without it passlib falls back to the host's crypt(3),
+# which Python drops in 3.13 and not every base image supports -- so the hash a
+# password gets would depend on where the container happens to run.
+bcrypt==4.2.1

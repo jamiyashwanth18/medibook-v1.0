@@ -8,7 +8,26 @@ import { brand } from "@/lib/brand";
 import { useNavigate } from "@/lib/navigate";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const { Button, Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, Input, Label, Select, Badge, Table, THead, TBody, TR, TH, TD, Empty } = UI;
+const {
+  Button,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+  Input,
+  Label,
+  Select,
+  Badge,
+  Table,
+  THead,
+  TBody,
+  TR,
+  TH,
+  TD,
+  Empty,
+} = UI;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { Check, ChevronRight, Clock, Trash, AlertCircle, CheckCircle } = Icons;
 
@@ -69,7 +88,15 @@ const BOOKED_APPOINTMENTS = [
 
 function hexToRgba(hex, alpha) {
   const h = String(hex).replace("#", "");
-  const n = parseInt(h.length === 3 ? h.split("").map((c) => c + c).join("") : h, 16);
+  const n = parseInt(
+    h.length === 3
+      ? h
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : h,
+    16,
+  );
   const r = (n >> 16) & 255;
   const g = (n >> 8) & 255;
   const b = n & 255;
@@ -92,12 +119,24 @@ function dayName(v) {
 
 function fmtDateTime(iso) {
   const d = new Date(iso);
-  return d.getDate() + " " + MONTHS[d.getMonth()] + " " + d.getFullYear() + ", " + pad2(d.getHours()) + ":" + pad2(d.getMinutes());
+  return (
+    d.getDate() +
+    " " +
+    MONTHS[d.getMonth()] +
+    " " +
+    d.getFullYear() +
+    ", " +
+    pad2(d.getHours()) +
+    ":" +
+    pad2(d.getMinutes())
+  );
 }
 
 function fmtDayTime(iso) {
   const d = new Date(iso);
-  return d.getDate() + " " + MONTHS[d.getMonth()] + " " + pad2(d.getHours()) + ":" + pad2(d.getMinutes());
+  return (
+    d.getDate() + " " + MONTHS[d.getMonth()] + " " + pad2(d.getHours()) + ":" + pad2(d.getMinutes())
+  );
 }
 
 function fmtSpan(startIso, endIso) {
@@ -110,8 +149,16 @@ function fmtSpan(startIso, endIso) {
     return a.getDate() + " – " + b.getDate() + " " + MONTHS[a.getMonth()] + " " + a.getFullYear();
   }
   return (
-    a.getDate() + " " + MONTHS[a.getMonth()] + (a.getFullYear() !== b.getFullYear() ? " " + a.getFullYear() : "") +
-    " – " + b.getDate() + " " + MONTHS[b.getMonth()] + " " + b.getFullYear()
+    a.getDate() +
+    " " +
+    MONTHS[a.getMonth()] +
+    (a.getFullYear() !== b.getFullYear() ? " " + a.getFullYear() : "") +
+    " – " +
+    b.getDate() +
+    " " +
+    MONTHS[b.getMonth()] +
+    " " +
+    b.getFullYear()
   );
 }
 
@@ -181,8 +228,10 @@ export default function Screen() {
 
   const sortedRules = React.useMemo(
     () =>
-      rules.slice().sort((a, b) => (a.weekday - b.weekday) || (toMinutes(a.start_time) - toMinutes(b.start_time))),
-    [rules]
+      rules
+        .slice()
+        .sort((a, b) => a.weekday - b.weekday || toMinutes(a.start_time) - toMinutes(b.start_time)),
+    [rules],
   );
 
   const minutesByDay = React.useMemo(() => {
@@ -197,15 +246,22 @@ export default function Screen() {
   }, [rules]);
 
   const totalSlots = React.useMemo(
-    () => rules.reduce((sum, r) => sum + Math.floor(Math.max(0, toMinutes(r.end_time) - toMinutes(r.start_time)) / SLOT_MINUTES), 0),
-    [rules]
+    () =>
+      rules.reduce(
+        (sum, r) =>
+          sum +
+          Math.floor(Math.max(0, toMinutes(r.end_time) - toMinutes(r.start_time)) / SLOT_MINUTES),
+        0,
+      ),
+    [rules],
   );
 
   const maxDayMinutes = Math.max(60, ...WEEKDAYS.map((d) => minutesByDay[d.v]));
 
   const conflictBlocks = React.useMemo(
-    () => timeOff.map((b) => ({ block: b, hits: conflictsFor(b) })).filter((x) => x.hits.length > 0),
-    [timeOff]
+    () =>
+      timeOff.map((b) => ({ block: b, hits: conflictsFor(b) })).filter((x) => x.hits.length > 0),
+    [timeOff],
   );
 
   const focused =
@@ -220,7 +276,9 @@ export default function Screen() {
       return;
     }
     if (!start_time || !end_time) {
-      setHoursError("Enter both a start time and an end time so the block has a length to divide into slots.");
+      setHoursError(
+        "Enter both a start time and an end time so the block has a length to divide into slots.",
+      );
       return;
     }
     const wd = Number(weekday);
@@ -228,15 +286,30 @@ export default function Screen() {
     const en = toMinutes(end_time);
     if (en <= s) {
       setHoursError(
-        dayName(wd) + " " + start_time + " – " + end_time + " ends before it starts. Set an end time later than the start time."
+        dayName(wd) +
+          " " +
+          start_time +
+          " – " +
+          end_time +
+          " ends before it starts. Set an end time later than the start time.",
       );
       return;
     }
-    const clash = rules.find((r) => r.weekday === wd && s < toMinutes(r.end_time) && en > toMinutes(r.start_time));
+    const clash = rules.find(
+      (r) => r.weekday === wd && s < toMinutes(r.end_time) && en > toMinutes(r.start_time),
+    );
     if (clash) {
       setHoursError(
-        dayName(wd) + " " + start_time + " – " + end_time + " overlaps " + clash.start_time + " – " + clash.end_time +
-          ". Fix the overlapping range before saving."
+        dayName(wd) +
+          " " +
+          start_time +
+          " – " +
+          end_time +
+          " overlaps " +
+          clash.start_time +
+          " – " +
+          clash.end_time +
+          ". Fix the overlapping range before saving.",
       );
       return;
     }
@@ -244,11 +317,19 @@ export default function Screen() {
     setHoursSaving(true);
     defer(() => {
       idSeed.current += 1;
-      setRules((prev) => prev.concat([{ id: "rule_" + idSeed.current, weekday: wd, start_time, end_time }]));
+      setRules((prev) =>
+        prev.concat([{ id: "rule_" + idSeed.current, weekday: wd, start_time, end_time }]),
+      );
       setHoursSaving(false);
       setHoursDraft({ weekday: "", start_time: "", end_time: "" });
       setHoursNote(
-        "saved — " + dayName(wd) + " " + start_time + " – " + end_time + " added. future slots updated, booked appointments untouched."
+        "saved — " +
+          dayName(wd) +
+          " " +
+          start_time +
+          " – " +
+          end_time +
+          " added. future slots updated, booked appointments untouched.",
       );
     });
   }
@@ -281,9 +362,16 @@ export default function Screen() {
       setFocusBlock(hits.length ? block.id : focusBlock);
       setOffNote(
         hits.length
-          ? "saved — no new slots will generate for " + fmtSpan(block.start_at, block.end_at) + ". check the warning below: " +
-            hits.length + " booked appointment" + (hits.length === 1 ? "" : "s") + " already sit inside it."
-          : "saved — no slots will generate for " + fmtSpan(block.start_at, block.end_at) + ". nothing was already booked in it."
+          ? "saved — no new slots will generate for " +
+              fmtSpan(block.start_at, block.end_at) +
+              ". check the warning below: " +
+              hits.length +
+              " booked appointment" +
+              (hits.length === 1 ? "" : "s") +
+              " already sit inside it."
+          : "saved — no slots will generate for " +
+              fmtSpan(block.start_at, block.end_at) +
+              ". nothing was already booked in it.",
       );
     });
   }
@@ -321,7 +409,12 @@ export default function Screen() {
     width: "100%",
     fontFamily: brand.fontBody,
   };
-  const labelStyle = { color: muted, fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase" };
+  const labelStyle = {
+    color: muted,
+    fontSize: "12px",
+    letterSpacing: "0.08em",
+    textTransform: "uppercase",
+  };
   const primaryBtn = {
     backgroundColor: ink,
     color: cream,
@@ -347,9 +440,17 @@ export default function Screen() {
     "@keyframes atrium-in{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}" +
     ".atrium-fade{animation:atrium-fade .3s ease-out both}" +
     "@keyframes atrium-fade{from{opacity:0}to{opacity:1}}" +
-    ".atrium-focus:focus-visible{outline:2px solid " + ink + ";outline-offset:3px;box-shadow:0 0 0 6px " + hexToRgba(accent, 0.3) + "}" +
-    ".atrium-ghost:hover{background-color:" + hexToRgba(ink, 0.07) + "}" +
-    ".atrium-primary:hover{background-color:" + hexToRgba(ink, 0.86) + "}" +
+    ".atrium-focus:focus-visible{outline:2px solid " +
+    ink +
+    ";outline-offset:3px;box-shadow:0 0 0 6px " +
+    hexToRgba(accent, 0.3) +
+    "}" +
+    ".atrium-ghost:hover{background-color:" +
+    hexToRgba(ink, 0.07) +
+    "}" +
+    ".atrium-primary:hover{background-color:" +
+    hexToRgba(ink, 0.86) +
+    "}" +
     ".atrium-primary:disabled{opacity:.55;cursor:progress}" +
     ".atrium-tab tbody tr:last-child{border-bottom:0}" +
     "@media (prefers-reduced-motion:reduce){.atrium-row,.atrium-fade{animation:none}.atrium-bar{transition:none!important}}";
@@ -366,7 +467,9 @@ export default function Screen() {
         <header data-wf="b-0-0" className="mb-6">
           <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
             <div>
-              <p style={{ ...labelStyle, letterSpacing: "0.16em" }}>dr. anita rao · general medicine</p>
+              <p style={{ ...labelStyle, letterSpacing: "0.16em" }}>
+                dr. anita rao · general medicine
+              </p>
               <h1
                 className="mt-3 text-[34px] leading-tight sm:text-[40px]"
                 style={{ fontFamily: brand.fontHeading, fontStyle: "italic", fontWeight: 600 }}
@@ -376,7 +479,12 @@ export default function Screen() {
             </div>
             <p
               className="flex items-center gap-2 text-[13px]"
-              style={{ color: muted, backgroundColor: surfaceDeep, borderRadius: "999px", padding: "8px 16px" }}
+              style={{
+                color: muted,
+                backgroundColor: surfaceDeep,
+                borderRadius: "999px",
+                padding: "8px 16px",
+              }}
             >
               <Clock aria-hidden="true" className="h-4 w-4" style={{ color: accent }} />
               <span style={{ fontVariantNumeric: "tabular-nums" }}>
@@ -392,14 +500,17 @@ export default function Screen() {
           className="mb-10 max-w-[68ch] text-[16px] leading-relaxed"
           style={{ color: muted }}
         >
-          Bookable slots are generated in 30-minute blocks from your weekly hours. Changes apply to future slots only
-          and never move appointments already booked.
+          Bookable slots are generated in 30-minute blocks from your weekly hours. Changes apply to
+          future slots only and never move appointments already booked.
         </p>
 
         {/* b-2-0 recurring weekly hours */}
         <section data-wf="b-2-0" style={panelArch} className="mb-8 px-6 pb-8 pt-10 sm:px-10">
           <div className="flex flex-wrap items-baseline justify-between gap-3">
-            <h2 className="text-[24px]" style={{ fontFamily: brand.fontHeading, fontStyle: "italic", fontWeight: 600 }}>
+            <h2
+              className="text-[24px]"
+              style={{ fontFamily: brand.fontHeading, fontStyle: "italic", fontWeight: 600 }}
+            >
               Recurring weekly hours
             </h2>
             <p className="text-[13px]" style={{ color: muted, fontVariantNumeric: "tabular-nums" }}>
@@ -408,14 +519,21 @@ export default function Screen() {
           </div>
 
           {/* signature: arch chart of the generated week */}
-          <ul className="mt-6 flex items-end gap-2 sm:gap-4" aria-label="Slots generated per weekday">
+          <ul
+            className="mt-6 flex items-end gap-2 sm:gap-4"
+            aria-label="Slots generated per weekday"
+          >
             {WEEKDAYS.map((d) => {
               const mins = minutesByDay[d.v];
               const slots = Math.floor(mins / SLOT_MINUTES);
               const h = mins === 0 ? 10 : Math.max(22, Math.round((mins / maxDayMinutes) * 76));
               return (
                 <li key={d.v} className="flex flex-1 flex-col items-center gap-2">
-                  <span aria-hidden="true" className="text-[11px]" style={{ color: muted, fontVariantNumeric: "tabular-nums" }}>
+                  <span
+                    aria-hidden="true"
+                    className="text-[11px]"
+                    style={{ color: muted, fontVariantNumeric: "tabular-nums" }}
+                  >
                     {slots || "–"}
                   </span>
                   <div
@@ -449,19 +567,41 @@ export default function Screen() {
               />
             </div>
           ) : (
-            <Table className="atrium-tab mt-2 w-full text-left" style={{ fontVariantNumeric: "tabular-nums" }}>
+            <Table
+              className="atrium-tab mt-2 w-full text-left"
+              style={{ fontVariantNumeric: "tabular-nums" }}
+            >
               <THead>
                 <TR style={{ borderBottom: "1px solid " + hair }}>
-                  <TH data-wf="i-2-0-0" scope="col" className="py-4 pr-4 text-[12px] font-semibold uppercase tracking-[0.08em]" style={{ color: muted }}>
+                  <TH
+                    data-wf="i-2-0-0"
+                    scope="col"
+                    className="py-4 pr-4 text-[12px] font-semibold uppercase tracking-[0.08em]"
+                    style={{ color: muted }}
+                  >
                     Weekday
                   </TH>
-                  <TH data-wf="i-2-0-1" scope="col" className="py-4 pr-4 text-[12px] font-semibold uppercase tracking-[0.08em]" style={{ color: muted }}>
+                  <TH
+                    data-wf="i-2-0-1"
+                    scope="col"
+                    className="py-4 pr-4 text-[12px] font-semibold uppercase tracking-[0.08em]"
+                    style={{ color: muted }}
+                  >
                     Start time
                   </TH>
-                  <TH data-wf="i-2-0-2" scope="col" className="py-4 pr-4 text-[12px] font-semibold uppercase tracking-[0.08em]" style={{ color: muted }}>
+                  <TH
+                    data-wf="i-2-0-2"
+                    scope="col"
+                    className="py-4 pr-4 text-[12px] font-semibold uppercase tracking-[0.08em]"
+                    style={{ color: muted }}
+                  >
                     End time
                   </TH>
-                  <TH scope="col" className="py-4 text-right text-[12px] font-semibold uppercase tracking-[0.08em]" style={{ color: muted }}>
+                  <TH
+                    scope="col"
+                    className="py-4 text-right text-[12px] font-semibold uppercase tracking-[0.08em]"
+                    style={{ color: muted }}
+                  >
                     Slots
                   </TH>
                 </TR>
@@ -472,21 +612,38 @@ export default function Screen() {
                   const slots = Math.floor(mins / SLOT_MINUTES);
                   if (confirmRule === r.id) {
                     return (
-                      <TR key={r.id} className="atrium-fade" style={{ borderBottom: "1px solid " + hair, backgroundColor: hexToRgba(accent, 0.12) }}>
+                      <TR
+                        key={r.id}
+                        className="atrium-fade"
+                        style={{
+                          borderBottom: "1px solid " + hair,
+                          backgroundColor: hexToRgba(accent, 0.12),
+                        }}
+                      >
                         <TD colSpan={4} className="py-4">
                           <div className="flex flex-wrap items-center justify-between gap-4">
                             <span className="text-[14px]">
-                              Remove {dayName(r.weekday)} {r.start_time} – {r.end_time}? Future slots in this block stop
-                              generating; booked appointments stay.
+                              Remove {dayName(r.weekday)} {r.start_time} – {r.end_time}? Future
+                              slots in this block stop generating; booked appointments stay.
                             </span>
                             <span className="flex gap-3">
-                              <button type="button" className="atrium-focus atrium-ghost" style={quietBtn} onClick={() => setConfirmRule(null)}>
+                              <button
+                                type="button"
+                                className="atrium-focus atrium-ghost"
+                                style={quietBtn}
+                                onClick={() => setConfirmRule(null)}
+                              >
                                 Keep it
                               </button>
                               <button
                                 type="button"
                                 className="atrium-focus"
-                                style={{ ...quietBtn, backgroundColor: ink, color: cream, border: "1px solid " + ink }}
+                                style={{
+                                  ...quietBtn,
+                                  backgroundColor: ink,
+                                  color: cream,
+                                  border: "1px solid " + ink,
+                                }}
                                 onClick={() => removeRule(r.id)}
                               >
                                 Remove block
@@ -498,7 +655,11 @@ export default function Screen() {
                     );
                   }
                   return (
-                    <TR key={r.id} className="atrium-row" style={{ borderBottom: "1px solid " + hair }}>
+                    <TR
+                      key={r.id}
+                      className="atrium-row"
+                      style={{ borderBottom: "1px solid " + hair }}
+                    >
                       <TD className="py-4 pr-4 text-[15px]">{dayName(r.weekday)}</TD>
                       <TD className="py-4 pr-4 text-[15px]">{r.start_time}</TD>
                       <TD className="py-4 pr-4 text-[15px]">{r.end_time}</TD>
@@ -509,7 +670,14 @@ export default function Screen() {
                           </span>
                           <button
                             type="button"
-                            aria-label={"Remove " + dayName(r.weekday) + " " + r.start_time + " to " + r.end_time}
+                            aria-label={
+                              "Remove " +
+                              dayName(r.weekday) +
+                              " " +
+                              r.start_time +
+                              " to " +
+                              r.end_time
+                            }
                             className="atrium-focus atrium-ghost inline-flex h-11 w-11 items-center justify-center"
                             style={{ borderRadius: "999px", color: ink }}
                             onClick={() => setConfirmRule(r.id)}
@@ -530,7 +698,10 @@ export default function Screen() {
         <form onSubmit={submitHours} className="mb-6 grid grid-cols-12 gap-6">
           <div data-wf="b-3-0" className="col-span-12 lg:col-span-9" style={panelSoft}>
             <fieldset className="px-6 py-7 sm:px-8">
-              <legend className="px-1 text-[20px]" style={{ fontFamily: brand.fontHeading, fontStyle: "italic", fontWeight: 600 }}>
+              <legend
+                className="px-1 text-[20px]"
+                style={{ fontFamily: brand.fontHeading, fontStyle: "italic", fontWeight: 600 }}
+              >
                 Add working hours
               </legend>
               <div className="mt-5 grid gap-5 sm:grid-cols-3">
@@ -586,7 +757,8 @@ export default function Screen() {
                 </div>
               </div>
               <p className="mt-4 text-[13px]" style={{ color: muted }}>
-                blocks repeat every week until you change them. a 09:00 – 13:00 block makes eight 30-minute slots.
+                blocks repeat every week until you change them. a 09:00 – 13:00 block makes eight
+                30-minute slots.
               </p>
             </fieldset>
           </div>
@@ -625,9 +797,14 @@ export default function Screen() {
             </p>
           ) : (
             <p className="flex items-start gap-3 text-[14px]" style={{ color: muted }}>
-              <CheckCircle aria-hidden="true" className="mt-[2px] h-4 w-4 shrink-0" style={{ color: accent }} />
+              <CheckCircle
+                aria-hidden="true"
+                className="mt-[2px] h-4 w-4 shrink-0"
+                style={{ color: accent }}
+              />
               <span style={{ fontVariantNumeric: "tabular-nums" }}>
-                {totalSlots} bookable 30-minute slots generate each week from these hours — {hoursNote}
+                {totalSlots} bookable 30-minute slots generate each week from these hours —{" "}
+                {hoursNote}
               </span>
             </p>
           )}
@@ -636,7 +813,10 @@ export default function Screen() {
         {/* b-5-0 time off table */}
         <section data-wf="b-5-0" style={panelArch} className="mb-8 px-6 pb-8 pt-10 sm:px-10">
           <div className="flex flex-wrap items-baseline justify-between gap-3">
-            <h2 className="text-[24px]" style={{ fontFamily: brand.fontHeading, fontStyle: "italic", fontWeight: 600 }}>
+            <h2
+              className="text-[24px]"
+              style={{ fontFamily: brand.fontHeading, fontStyle: "italic", fontWeight: 600 }}
+            >
               Time off
             </h2>
             <p className="text-[13px]" style={{ color: muted }}>
@@ -652,19 +832,41 @@ export default function Screen() {
               />
             </div>
           ) : (
-            <Table className="atrium-tab mt-6 w-full text-left" style={{ fontVariantNumeric: "tabular-nums" }}>
+            <Table
+              className="atrium-tab mt-6 w-full text-left"
+              style={{ fontVariantNumeric: "tabular-nums" }}
+            >
               <THead>
                 <TR style={{ borderBottom: "1px solid " + hair }}>
-                  <TH data-wf="i-5-0-0" scope="col" className="py-4 pr-4 text-[12px] font-semibold uppercase tracking-[0.08em]" style={{ color: muted }}>
+                  <TH
+                    data-wf="i-5-0-0"
+                    scope="col"
+                    className="py-4 pr-4 text-[12px] font-semibold uppercase tracking-[0.08em]"
+                    style={{ color: muted }}
+                  >
                     Starts
                   </TH>
-                  <TH data-wf="i-5-0-1" scope="col" className="py-4 pr-4 text-[12px] font-semibold uppercase tracking-[0.08em]" style={{ color: muted }}>
+                  <TH
+                    data-wf="i-5-0-1"
+                    scope="col"
+                    className="py-4 pr-4 text-[12px] font-semibold uppercase tracking-[0.08em]"
+                    style={{ color: muted }}
+                  >
                     Ends
                   </TH>
-                  <TH data-wf="i-5-0-2" scope="col" className="py-4 pr-4 text-[12px] font-semibold uppercase tracking-[0.08em]" style={{ color: muted }}>
+                  <TH
+                    data-wf="i-5-0-2"
+                    scope="col"
+                    className="py-4 pr-4 text-[12px] font-semibold uppercase tracking-[0.08em]"
+                    style={{ color: muted }}
+                  >
                     Reason
                   </TH>
-                  <TH scope="col" className="py-4 text-right text-[12px] font-semibold uppercase tracking-[0.08em]" style={{ color: muted }}>
+                  <TH
+                    scope="col"
+                    className="py-4 text-right text-[12px] font-semibold uppercase tracking-[0.08em]"
+                    style={{ color: muted }}
+                  >
                     Conflicts
                   </TH>
                 </TR>
@@ -674,21 +876,38 @@ export default function Screen() {
                   const hits = conflictsFor(b);
                   if (confirmOff === b.id) {
                     return (
-                      <TR key={b.id} className="atrium-fade" style={{ borderBottom: "1px solid " + hair, backgroundColor: hexToRgba(accent, 0.12) }}>
+                      <TR
+                        key={b.id}
+                        className="atrium-fade"
+                        style={{
+                          borderBottom: "1px solid " + hair,
+                          backgroundColor: hexToRgba(accent, 0.12),
+                        }}
+                      >
                         <TD colSpan={4} className="py-4">
                           <div className="flex flex-wrap items-center justify-between gap-4">
                             <span className="text-[14px]">
-                              Remove time off for {fmtSpan(b.start_at, b.end_at)}? Slots will generate again for that
-                              period.
+                              Remove time off for {fmtSpan(b.start_at, b.end_at)}? Slots will
+                              generate again for that period.
                             </span>
                             <span className="flex gap-3">
-                              <button type="button" className="atrium-focus atrium-ghost" style={quietBtn} onClick={() => setConfirmOff(null)}>
+                              <button
+                                type="button"
+                                className="atrium-focus atrium-ghost"
+                                style={quietBtn}
+                                onClick={() => setConfirmOff(null)}
+                              >
                                 Keep it
                               </button>
                               <button
                                 type="button"
                                 className="atrium-focus"
-                                style={{ ...quietBtn, backgroundColor: ink, color: cream, border: "1px solid " + ink }}
+                                style={{
+                                  ...quietBtn,
+                                  backgroundColor: ink,
+                                  color: cream,
+                                  border: "1px solid " + ink,
+                                }}
                                 onClick={() => removeOff(b.id)}
                               >
                                 Remove time off
@@ -700,7 +919,11 @@ export default function Screen() {
                     );
                   }
                   return (
-                    <TR key={b.id} className="atrium-row" style={{ borderBottom: "1px solid " + hair }}>
+                    <TR
+                      key={b.id}
+                      className="atrium-row"
+                      style={{ borderBottom: "1px solid " + hair }}
+                    >
                       <TD className="py-4 pr-4 text-[15px]">{fmtDateTime(b.start_at)}</TD>
                       <TD className="py-4 pr-4 text-[15px]">{fmtDateTime(b.end_at)}</TD>
                       <TD className="py-4 pr-4 text-[15px]" style={{ color: muted }}>
@@ -749,7 +972,10 @@ export default function Screen() {
         <form onSubmit={submitTimeOff} className="mb-6 grid grid-cols-12 gap-6">
           <div data-wf="b-6-0" className="col-span-12 lg:col-span-9" style={panelSoft}>
             <fieldset className="px-6 py-7 sm:px-8">
-              <legend className="px-1 text-[20px]" style={{ fontFamily: brand.fontHeading, fontStyle: "italic", fontWeight: 600 }}>
+              <legend
+                className="px-1 text-[20px]"
+                style={{ fontFamily: brand.fontHeading, fontStyle: "italic", fontWeight: 600 }}
+              >
                 Add time off
               </legend>
               <div className="mt-5 grid gap-5 sm:grid-cols-3">
@@ -810,13 +1036,22 @@ export default function Screen() {
                   </span>
                 </p>
               ) : offNote ? (
-                <p role="status" className="atrium-fade mt-4 flex items-start gap-2 text-[14px]" style={{ color: muted }}>
-                  <Check aria-hidden="true" className="mt-[2px] h-4 w-4 shrink-0" style={{ color: accent }} />
+                <p
+                  role="status"
+                  className="atrium-fade mt-4 flex items-start gap-2 text-[14px]"
+                  style={{ color: muted }}
+                >
+                  <Check
+                    aria-hidden="true"
+                    className="mt-[2px] h-4 w-4 shrink-0"
+                    style={{ color: accent }}
+                  />
                   <span>{offNote}</span>
                 </p>
               ) : (
                 <p className="mt-4 text-[13px]" style={{ color: muted }}>
-                  the reason stays private to you and the front desk — patients only see the time as unavailable.
+                  the reason stays private to you and the front desk — patients only see the time as
+                  unavailable.
                 </p>
               )}
             </fieldset>
@@ -854,7 +1089,11 @@ export default function Screen() {
               {focused ? (
                 <AlertCircle aria-hidden="true" className="mt-[3px] h-5 w-5 shrink-0" />
               ) : (
-                <CheckCircle aria-hidden="true" className="mt-[3px] h-5 w-5 shrink-0" style={{ color: accent }} />
+                <CheckCircle
+                  aria-hidden="true"
+                  className="mt-[3px] h-5 w-5 shrink-0"
+                  style={{ color: accent }}
+                />
               )}
               <span>
                 {focused
@@ -877,14 +1116,17 @@ export default function Screen() {
           </CardHeader>
           <CardContent className="px-6 sm:px-8">
             {focused && others.length > 0 ? (
-              <p className="text-[13px]" style={{ color: muted, fontVariantNumeric: "tabular-nums" }}>
+              <p
+                className="text-[13px]"
+                style={{ color: muted, fontVariantNumeric: "tabular-nums" }}
+              >
                 also overlapping:{" "}
                 {others
                   .map(
                     (o) =>
                       fmtSpan(o.block.start_at, o.block.end_at) +
                       " — " +
-                      o.hits.map((a) => a.patient + ", " + fmtDayTime(a.start)).join(", ")
+                      o.hits.map((a) => a.patient + ", " + fmtDayTime(a.start)).join(", "),
                   )
                   .join(" · ")}
               </p>

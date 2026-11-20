@@ -8,7 +8,21 @@ import { brand } from "@/lib/brand";
 import { useNavigate } from "@/lib/navigate";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const { Button, Textarea, Label, Select, Table, THead, TBody, TR, TH, TD, Avatar, Separator, Empty } = UI;
+const {
+  Button,
+  Textarea,
+  Label,
+  Select,
+  Table,
+  THead,
+  TBody,
+  TR,
+  TH,
+  TD,
+  Avatar,
+  Separator,
+  Empty,
+} = UI;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { Filter } = Icons;
 
@@ -158,9 +172,11 @@ const SEED_APPOINTMENTS = [
     end: "10:00",
     status: "completed",
     record: {
-      notes: "three-week dry cough, worse at night. chest clear on auscultation, no fever, spo2 98% on room air.",
+      notes:
+        "three-week dry cough, worse at night. chest clear on auscultation, no fever, spo2 98% on room air.",
       diagnosis: "post-viral cough, resolving",
-      prescription: "levocetirizine 5 mg at night for five days. steam inhalation twice daily. review if the cough passes ten days.",
+      prescription:
+        "levocetirizine 5 mg at night for five days. steam inhalation twice daily. review if the cough passes ten days.",
       updated_at: "19 nov 2026, 10:06",
     },
   },
@@ -183,9 +199,11 @@ const SEED_APPOINTMENTS = [
     end: "14:30",
     status: "completed",
     record: {
-      notes: "follow-up for hypertension. bp 138/86 seated, left arm. reports occasional evening headaches.",
+      notes:
+        "follow-up for hypertension. bp 138/86 seated, left arm. reports occasional evening headaches.",
       diagnosis: "stage 1 hypertension, partially controlled",
-      prescription: "continue amlodipine 5 mg once daily. home bp log twice a day for two weeks. review 4 dec.",
+      prescription:
+        "continue amlodipine 5 mg once daily. home bp log twice a day for two weeks. review 4 dec.",
       updated_at: "19 nov 2026, 14:28",
     },
   },
@@ -198,9 +216,11 @@ const SEED_APPOINTMENTS = [
     end: "11:30",
     status: "completed",
     record: {
-      notes: "right ankle pain after a fall on the stairs on 16 nov. mild lateral swelling, full weight bearing possible, no bony tenderness.",
+      notes:
+        "right ankle pain after a fall on the stairs on 16 nov. mild lateral swelling, full weight bearing possible, no bony tenderness.",
       diagnosis: "grade 1 lateral ankle sprain",
-      prescription: "rest, ice fifteen minutes thrice daily, crepe bandage. paracetamol 500 mg as needed, maximum three a day.",
+      prescription:
+        "rest, ice fifteen minutes thrice daily, crepe bandage. paracetamol 500 mg as needed, maximum three a day.",
       updated_at: "18 nov 2026, 11:31",
     },
   },
@@ -221,7 +241,15 @@ const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function tint(hex, alpha) {
   const h = String(hex).replace("#", "");
-  const n = parseInt(h.length === 3 ? h.split("").map((c) => c + c).join("") : h, 16);
+  const n = parseInt(
+    h.length === 3
+      ? h
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : h,
+    16,
+  );
   return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
 }
 
@@ -327,14 +355,19 @@ export default function Screen() {
   const saveStatus = () => {
     if (!selected) return;
     if (statusDraft === selected.status) {
-      setStatusNote({ tone: "info", text: `${selected.patient_name.toLowerCase()} is already marked ${selected.status}. nothing to save.` });
+      setStatusNote({
+        tone: "info",
+        text: `${selected.patient_name.toLowerCase()} is already marked ${selected.status}. nothing to save.`,
+      });
       return;
     }
     setStatusSaving(true);
     setStatusNote(null);
     later(() => {
       const next = statusDraft;
-      setAppointments((prev) => prev.map((a) => (a.id === selected.id ? { ...a, status: next } : a)));
+      setAppointments((prev) =>
+        prev.map((a) => (a.id === selected.id ? { ...a, status: next } : a)),
+      );
       setStatusSaving(false);
       setStatusNote({
         tone: "success",
@@ -349,7 +382,9 @@ export default function Screen() {
   const saveRecord = () => {
     if (!selected) return;
     if (!draft.diagnosis.trim()) {
-      setRecordError("a diagnosis is needed before this record can be filed. your notes and prescription are still here.");
+      setRecordError(
+        "a diagnosis is needed before this record can be filed. your notes and prescription are still here.",
+      );
       setRecordNote(null);
       return;
     }
@@ -368,14 +403,14 @@ export default function Screen() {
                   updated_at: "20 nov 2026, 11:52",
                 },
               }
-            : a
-        )
+            : a,
+        ),
       );
       setRecordSaving(false);
       setRecordNote(
         selected.record
           ? `record updated for ${selected.patient_name.toLowerCase()} — the change is in the audit trail as consultation_record.update.`
-          : `record filed for ${selected.patient_name.toLowerCase()} — it now shows in their own records, and the entry is in the audit trail.`
+          : `record filed for ${selected.patient_name.toLowerCase()} — it now shows in their own records, and the entry is in the audit trail.`,
       );
     }, 800);
   };
@@ -443,9 +478,12 @@ export default function Screen() {
           <h1 className="text-[34px] leading-tight sm:text-[40px]" style={headingStyle}>
             My schedule
           </h1>
-          <p className="mt-3 max-w-[62ch] text-[15px] leading-relaxed" style={{ color: tint(ink, 0.78) }}>
-            dr. anjali rao · general medicine · 30-minute slots. everything you have been booked for, and the
-            consultation record for each visit.
+          <p
+            className="mt-3 max-w-[62ch] text-[15px] leading-relaxed"
+            style={{ color: tint(ink, 0.78) }}
+          >
+            dr. anjali rao · general medicine · 30-minute slots. everything you have been booked
+            for, and the consultation record for each visit.
           </p>
         </header>
 
@@ -505,7 +543,11 @@ export default function Screen() {
             </div>
 
             <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-              <Icons.Filter className="hidden h-4 w-4 sm:block" aria-hidden="true" style={{ color: tint(ink, 0.55) }} />
+              <Icons.Filter
+                className="hidden h-4 w-4 sm:block"
+                aria-hidden="true"
+                style={{ color: tint(ink, 0.55) }}
+              />
               <div
                 role="tablist"
                 aria-label="Time range"
@@ -542,7 +584,10 @@ export default function Screen() {
             </div>
           </div>
 
-          <p className="mt-5 flex items-center gap-2 text-[13px]" style={{ color: tint(ink, 0.62) }}>
+          <p
+            className="mt-5 flex items-center gap-2 text-[13px]"
+            style={{ color: tint(ink, 0.62) }}
+          >
             <Icons.Clock className="h-3.5 w-3.5" aria-hidden="true" />
             <span style={{ fontVariantNumeric: "tabular-nums" }}>
               refreshed 11:45 ist · reload the page to pull in bookings made since then
@@ -563,7 +608,9 @@ export default function Screen() {
               My appointments ({visible.length})
             </h2>
             <p className="text-[13px]" style={{ color: tint(ink, 0.62) }}>
-              {tab === "upcoming" ? "upcoming visits, earliest first" : "past visits, most recent first"}
+              {tab === "upcoming"
+                ? "upcoming visits, earliest first"
+                : "past visits, most recent first"}
             </p>
           </div>
 
@@ -590,22 +637,50 @@ export default function Screen() {
             </div>
           ) : (
             <div className="overflow-hidden rounded-[24px]" style={panelSurface}>
-              <Table className="w-full" style={{ fontVariantNumeric: "tabular-nums", borderCollapse: "collapse" }}>
+              <Table
+                className="w-full"
+                style={{ fontVariantNumeric: "tabular-nums", borderCollapse: "collapse" }}
+              >
                 <THead>
                   <TR style={{ borderBottom: `1px solid ${tint(ink, 0.16)}` }}>
-                    <TH data-wf="i-2-0-0" className="px-6 py-4 text-left" style={labelStyle} scope="col">
+                    <TH
+                      data-wf="i-2-0-0"
+                      className="px-6 py-4 text-left"
+                      style={labelStyle}
+                      scope="col"
+                    >
                       Patient
                     </TH>
-                    <TH data-wf="i-2-0-1" className="px-6 py-4 text-left" style={labelStyle} scope="col">
+                    <TH
+                      data-wf="i-2-0-1"
+                      className="px-6 py-4 text-left"
+                      style={labelStyle}
+                      scope="col"
+                    >
                       Date
                     </TH>
-                    <TH data-wf="i-2-0-2" className="px-6 py-4 text-left" style={labelStyle} scope="col">
+                    <TH
+                      data-wf="i-2-0-2"
+                      className="px-6 py-4 text-left"
+                      style={labelStyle}
+                      scope="col"
+                    >
                       Time
                     </TH>
-                    <TH data-wf="i-2-0-3" className="px-6 py-4 text-left" style={labelStyle} scope="col">
+                    <TH
+                      data-wf="i-2-0-3"
+                      className="px-6 py-4 text-left"
+                      style={labelStyle}
+                      scope="col"
+                    >
                       Status
                     </TH>
-                    <TH data-wf="i-2-0-4" className="px-6 py-4 text-left" style={labelStyle} scope="col">
+                    <TH
+                      data-wf="i-2-0-4"
+                      className="px-6 py-4 text-left"
+                      style={labelStyle}
+                      scope="col"
+                    >
                       Consultation record
                     </TH>
                   </TR>
@@ -635,7 +710,10 @@ export default function Screen() {
                             <Avatar name={a.patient_name} className="h-9 w-9 shrink-0" />
                             <span className="text-[15px] font-medium">{a.patient_name}</span>
                             {isSelected ? (
-                              <span className="text-[12px] italic" style={{ color: tint(ink, 0.65) }}>
+                              <span
+                                className="text-[12px] italic"
+                                style={{ color: tint(ink, 0.65) }}
+                              >
                                 open below
                               </span>
                             ) : null}
@@ -650,7 +728,10 @@ export default function Screen() {
                         <TD className="px-6 py-4">{statusChip(a.status)}</TD>
                         <TD className="px-6 py-4">
                           {a.record ? (
-                            <span className="inline-flex items-center gap-2 text-[14px]" style={{ color: ink }}>
+                            <span
+                              className="inline-flex items-center gap-2 text-[14px]"
+                              style={{ color: ink }}
+                            >
                               <Icons.FileText className="h-4 w-4" aria-hidden="true" />
                               written · {a.record.updated_at}
                             </span>
@@ -687,7 +768,12 @@ export default function Screen() {
             <section data-wf="b-3-0" className="mx-auto max-w-3xl text-center">
               <span
                 className="inline-flex items-center gap-2 rounded-full px-5 py-1.5 text-[12px] font-semibold"
-                style={{ backgroundColor: tint(gold, 0.26), color: ink, letterSpacing: "0.1em", textTransform: "uppercase" }}
+                style={{
+                  backgroundColor: tint(gold, 0.26),
+                  color: ink,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                }}
               >
                 <Icons.Calendar className="h-3.5 w-3.5" aria-hidden="true" />
                 selected visit
@@ -702,7 +788,8 @@ export default function Screen() {
               <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
                 {statusChip(selected.status, "lg")}
                 <span className="text-[13px]" style={{ color: tint(ink, 0.65) }}>
-                  appointment {selected.id} · patient {selected.patient_id} · in person, consulting room 2
+                  appointment {selected.id} · patient {selected.patient_id} · in person, consulting
+                  room 2
                 </span>
               </div>
               {selectedOutOfView ? (
@@ -710,7 +797,8 @@ export default function Screen() {
                   className="mx-auto mt-6 max-w-[60ch] rounded-[20px] px-5 py-3 text-[14px]"
                   style={{ backgroundColor: tint(neutral, 0.2), color: ink }}
                 >
-                  heads up — this visit sits outside the filters you have set above, so it is no longer in the list.
+                  heads up — this visit sits outside the filters you have set above, so it is no
+                  longer in the list.
                 </p>
               ) : null}
             </section>
@@ -775,12 +863,17 @@ export default function Screen() {
                   role="status"
                   className="atrium-rise flex items-start gap-3 rounded-[20px] px-5 py-4 text-[14px] leading-relaxed"
                   style={{
-                    backgroundColor: statusNote.tone === "success" ? tint(SAGE, 0.14) : tint(neutral, 0.2),
+                    backgroundColor:
+                      statusNote.tone === "success" ? tint(SAGE, 0.14) : tint(neutral, 0.2),
                     color: ink,
                   }}
                 >
                   {statusNote.tone === "success" ? (
-                    <Icons.CheckCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" style={{ color: SAGE }} />
+                    <Icons.CheckCircle
+                      className="mt-0.5 h-4 w-4 shrink-0"
+                      aria-hidden="true"
+                      style={{ color: SAGE }}
+                    />
                   ) : (
                     <Icons.AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
                   )}
@@ -807,16 +900,23 @@ export default function Screen() {
                   className="mt-4 flex items-start gap-3 rounded-[20px] px-5 py-4 text-[14px] leading-relaxed"
                   style={{ backgroundColor: tint(CLAY, 0.1), color: ink }}
                 >
-                  <Icons.AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" style={{ color: CLAY }} />
+                  <Icons.AlertCircle
+                    className="mt-0.5 h-4 w-4 shrink-0"
+                    aria-hidden="true"
+                    style={{ color: CLAY }}
+                  />
                   <span>
-                    this visit is cancelled, so its record is read-only. if the consultation did happen, set the status
-                    to completed above and the fields open again.
+                    this visit is cancelled, so its record is read-only. if the consultation did
+                    happen, set the status to completed above and the fields open again.
                   </span>
                 </p>
               ) : (
-                <p className="mt-3 max-w-[70ch] text-[14px] leading-relaxed" style={{ color: tint(ink, 0.72) }}>
-                  {selected.patient_name.toLowerCase()} can read this in their own records — write it so it is useful to
-                  them as well as to you.
+                <p
+                  className="mt-3 max-w-[70ch] text-[14px] leading-relaxed"
+                  style={{ color: tint(ink, 0.72) }}
+                >
+                  {selected.patient_name.toLowerCase()} can read this in their own records — write
+                  it so it is useful to them as well as to you.
                 </p>
               )}
 
@@ -890,7 +990,11 @@ export default function Screen() {
                   className="atrium-rise mt-5 flex items-start gap-3 rounded-[20px] px-5 py-4 text-[14px] leading-relaxed"
                   style={{ backgroundColor: tint(CLAY, 0.1), color: ink }}
                 >
-                  <Icons.AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" style={{ color: CLAY }} />
+                  <Icons.AlertCircle
+                    className="mt-0.5 h-4 w-4 shrink-0"
+                    aria-hidden="true"
+                    style={{ color: CLAY }}
+                  />
                   <span>{recordError}</span>
                 </p>
               ) : null}
@@ -901,7 +1005,11 @@ export default function Screen() {
                   className="atrium-rise mt-5 flex items-start gap-3 rounded-[20px] px-5 py-4 text-[14px] leading-relaxed"
                   style={{ backgroundColor: tint(SAGE, 0.14), color: ink }}
                 >
-                  <Icons.CheckCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" style={{ color: SAGE }} />
+                  <Icons.CheckCircle
+                    className="mt-0.5 h-4 w-4 shrink-0"
+                    aria-hidden="true"
+                    style={{ color: SAGE }}
+                  />
                   <span>{recordNote}</span>
                 </p>
               ) : null}
@@ -914,8 +1022,8 @@ export default function Screen() {
               style={{ backgroundColor: tint(neutral, 0.16), color: tint(ink, 0.88) }}
             >
               <Icons.FileText className="mr-2 inline h-4 w-4 align-[-2px]" aria-hidden="true" />
-              Text only — file attachments are not available in this version. Every view and edit of a record is written
-              to the audit trail.
+              Text only — file attachments are not available in this version. Every view and edit of
+              a record is written to the audit trail.
             </p>
 
             {/* Row 8: b-7-0 primary save, b-7-1 availability */}
@@ -944,7 +1052,10 @@ export default function Screen() {
                 }}
               >
                 Set working hours and time off
-                <Icons.ChevronRight className="ml-2 inline h-4 w-4 align-[-2px]" aria-hidden="true" />
+                <Icons.ChevronRight
+                  className="ml-2 inline h-4 w-4 align-[-2px]"
+                  aria-hidden="true"
+                />
               </Button>
             </div>
           </div>

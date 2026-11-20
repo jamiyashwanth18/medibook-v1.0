@@ -6,7 +6,6 @@ is a stub that returns a typed placeholder, so the service starts, serves its
 OpenAPI document and passes its tests before a single handler is implemented.
 """
 
-import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
@@ -14,7 +13,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app import models  # noqa: F401 -- imported so the tables register before create_all
-from app.database import Base, engine
+from app.bootstrap import seed_bootstrap_users
+from app.config import get_settings
+from app.database import Base, SessionLocal, engine
+from app.routers import api as api_router
+
+settings = get_settings()
 
 
 @asynccontextmanager
@@ -29,6 +33,16 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     read the error, not while pytest collects the files.
     """
     Base.metadata.create_all(bind=engine)
+
+    # MEDIA_ROOT is a writable directory that survives redeploys; make sure it exists
+    # before anything tries to write into it.
+    settings.media_root.mkdir(parents=True, exist_ok=True)
+
+    # The first admin and the smoke-test patient, from the environment, created only
+    # when they are not there already. Nothing is seeded when the variables are unset.
+    with SessionLocal() as session:
+        seed_bootstrap_users(session, settings)
+
     yield
 
 
@@ -43,15 +57,18 @@ app = FastAPI(
 # unless that origin is allowed here. In development that is the Vite dev server; when
 # deployed, the platform injects the frontend's real URL as ALLOWED_ORIGINS (comma
 # separated). Point ALLOWED_ORIGINS at the real thing and nothing else has to change.
-_dev_origins = ["http://localhost:5173", "http://127.0.0.1:5173"]
-_allowed_origins = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "").split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_allowed_origins or _dev_origins,
+    allow_origins=settings.allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# The routes the approved API spec declares. Each handler is still a stub; mounting
+# them here means the OpenAPI document, and the frontend written against it, see the
+# agreed paths from the first day.
+app.include_router(api_router.router)
 
 
 @app.get("/health")
