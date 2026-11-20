@@ -1,0 +1,32 @@
+# Behaviour rules
+
+How this app behaves where the requirements and the API contract do not say. QA's
+tests and the code both follow these rules. The platform keeps this file: the first
+rules come from the contract and the code, and each later rule from a decision made
+when a test and the code disagreed.
+
+- POST /auth/login takes {identifier, password} where identifier is matched against the user's email (case-insensitively) or phone, and any failure - unknown identifier, wrong password, or inactive account - returns 401 with the single generic body {"detail": "Invalid credentials"}.
+- A session token is an opaque random string (not a JWT) stored in sessions.token and sent on every protected call as the header `Authorization: Bearer <token>`; a missing, malformed, unknown, revoked or expired token returns 401 and never reveals which of those it was.
+- Logging in again creates an additional session row and leaves earlier tokens of that user valid, so a user may hold several concurrent sessions and each is revoked independently.
+- A session expires 30 minutes after its last authenticated request (last_activity_at is refreshed on each successful protected call) or 24 hours after creation, whichever comes first, after which every protected call returns 401.
+- POST /auth/logout sets revoked_at on the calling session and returns 204 with an empty body; reusing that token afterwards, including calling logout again, returns 401.
+- When a user's is_active becomes false, all of that user's existing sessions stop working immediately and their tokens return 401 on the next protected call.
+- Error bodies are FastAPI's default {"detail": "<message>"} for 400, 401, 403, 404 and 409, while request-validation failures return 422 with {"detail": [ ... ]} listing the offending fields.
+- A request for an id that does not exist returns 404, while a request for an existing resource the caller's role or ownership does not permit returns 403, and role checks run before ownership checks.
+- POST /auth/register always creates a user with role "patient" (any role sent in the body is ignored), creates the matching patients row linked to that user, returns 201 {user_id, role} and never returns a session token, so the client must call /auth/login afterwards.
+- Passwords are hashed with passlib bcrypt and must be at least 8 characters containing at least one letter and one digit; a weaker password returns 422 with the rules spelled out in the message.
+- Registering with an email or phone already in use returns 409, and supplying neither email nor phone returns 422.
+- Emails are trimmed and stored lower-cased and compared case-insensitively, specialization names and disease-mapping terms are unique and matched case-insensitively, while phone numbers and passwords are compared exactly as given.
+- All ids are UUID4 values rendered as lowercase hyphenated strings, and a path id that is unknown or not a valid UUID returns 404.
+- List endpoints return a plain JSON array with no paging or limit (single-clinic volume), ordered: appointments and slots by slot_start ascending, specializations by name ascending, disease mappings by term ascending, and consultation records and audit logs by their timestamp descending (newest first).
+- GET /specializations and GET /disease-mappings return only active rows by default and include deactivated ones only when called with ?include_inactive=true by an admin.
+- GET /doctors/search matches its query case-insensitively and trimmed against active disease-mapping terms first and then specialization names, returns only doctors whose is_active is true, and answers a non-matching term with 200 and an empty array rather than 404.
+- Every timestamp is stored and returned in UTC as ISO-8601 with a trailing "Z"; incoming datetimes without an offset are treated as UTC, and "upcoming", "past" and "today" are decided against the server's current UTC time.
+- Availability rules use weekday 0=Monday through 6=Sunday with "HH:MM" 24-hour times; PUT /doctors/{id}/availability replaces the doctor's whole rule set in one transaction and returns 422 if any end_time is not after its start_time or two ranges on the same weekday overlap, and it never alters existing appointments.
+- GET /doctors/{id}/slots accepts ?from and ?to dates, defaults to today through 14 days ahead, cuts each availability window into back-to-back slots of the doctor's slot_duration_minutes (default 30) starting at the window start, drops any trailing part shorter than a full slot, omits slots starting in the past, and returns an empty array for an inactive doctor.
+- A slot is omitted when it overlaps any time_off range (start inclusive, end exclusive) or any appointment in status booked, confirmed or completed; appointments in status cancelled or no-show release their slot back to the bookable list.
+- Booking and rescheduling require slot_start to exactly equal the start of a currently bookable slot; anything else - a stale, taken, past or non-aligned time - returns 409, enforced by a row lock plus a unique constraint on (doctor_id, slot_start) for non-released statuses so exactly one of two simultaneous bookers wins.
+- A patient booking ignores any patient_id in the body and books for their own patient record, an admin must supply patient_id to book on behalf, a patient supplying another patient's id for any appointment action gets 403, and doctors cannot create appointments (403).
+- Reschedule, cancel and DELETE are allowed only on an appointment that is still upcoming and in status booked or confirmed - otherwise 409 - and DELETE is a soft cancel that sets status to "cancelled", frees the slot and returns 200 with the updated appointment rather than deleting the row.
+- A consultation record may be created only by the appointment's treating doctor and only once per appointment (a second POST returns 409); edits are limited to the treating doctor, reads are limited to that patient, the treating doctor and admins, every create, edit and read writes an audit_logs row (actor_user_id, action, entity_type "consultation_record", entity_id, occurred_at), and GET /audit-l
+- Tests build everything they need through the HTTP API and never through the database: they log in as the bootstrap admin from BOOTSTRAP_ADMIN_EMAIL/BOOTSTRAP_ADMIN_PASSWORD, then create their own specializations, doctors, patients and appointments with per-test unique identifiers (e.g. a random suffix in the email, phone and name), so no test depends on data another test left behind.
