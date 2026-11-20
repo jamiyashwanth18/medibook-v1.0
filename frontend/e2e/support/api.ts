@@ -51,9 +51,7 @@ export async function apiCreateSpecialization(
     data: { name: `QA E2E Specialization ${suffix}` },
   });
   if (!response.ok()) {
-    throw new Error(
-      `create specialization failed: ${response.status()} ${await response.text()}`,
-    );
+    throw new Error(`create specialization failed: ${response.status()} ${await response.text()}`);
   }
   const body = await response.json();
   return body.id as string;

@@ -1,7 +1,12 @@
 import { expect, test } from "@playwright/test";
 
 import { adminCredentials } from "./support/admin";
-import { apiCreateDoctor, apiCreateSpecialization, apiLogin, apiRegisterPatient } from "./support/api";
+import {
+  apiCreateDoctor,
+  apiCreateSpecialization,
+  apiLogin,
+  apiRegisterPatient,
+} from "./support/api";
 
 // [AC-010] Signing in as the bootstrap admin reaches the admin dashboard.
 test("[AC-010] signing in as the admin reaches the admin dashboard", async ({ page }) => {

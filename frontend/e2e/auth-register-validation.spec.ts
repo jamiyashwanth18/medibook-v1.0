@@ -37,9 +37,7 @@ test("[AC-003][NFR-004] a password shorter than 8 characters shows the password 
   await expect(page.getByText("8 characters", { exact: false })).toBeVisible();
 });
 
-test("[AC-003][NFR-004] a password without a digit shows the password rules", async ({
-  page,
-}) => {
+test("[AC-003][NFR-004] a password without a digit shows the password rules", async ({ page }) => {
   const suffix = uniqueSuffix();
 
   await page.goto("/login");
